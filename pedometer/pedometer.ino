@@ -1,17 +1,17 @@
 #include "NineAxesMotion.h"
 #include <Wire.h>
+#include <SimpleTimer.h>
 
-NineAxesMotion mySensor;
-unsigned long lastStreamTime = 0;
-const int streamPeriod = 40;          //To stream at 50Hz without using additional timers (time period(ms) =1000/frequency(Hz))
+SimpleTimer timer;
+
+NineAxesMotion motionSensor;
 bool updateSensorData = true;         //Flag to update the sensor data. Default is true to perform the first read before the first stream
 int count = 0;
-int flag = -1;
-int thresholdX = 40;
-int thresholdY = 40;
-int thresholdZ = 0;
-int intervalCount = 0;
-int intervalCountThreshold = 3;
+byte flag = -1;
+byte thresholdX = 26;
+byte thresholdY = 30;
+byte intervalCount = 0;
+byte intervalCountThreshold = 3;
 
 void setup() //This code is executed once
 {
@@ -20,29 +20,19 @@ void setup() //This code is executed once
   I2C.begin();                    //Initialize I2C communication to the let the library communicate with the sensor.
 
   //Sensor Initialization
-  mySensor.initSensor();          //The I2C Address can be changed here inside this function in the library
-  mySensor.setOperationMode(OPERATION_MODE_NDOF);   //Can be configured to other operation modes as desired
-  mySensor.setUpdateMode(MANUAL);  //The default is AUTO. Changing to MANUAL requires calling the relevant update functions prior to calling the read functions
+  motionSensor.initSensor();          //The I2C Address can be changed here inside this function in the library
+  motionSensor.setOperationMode(OPERATION_MODE_NDOF);   //Can be configured to other operation modes as desired
+  motionSensor.setUpdateMode(MANUAL);  //The default is AUTO. Changing to MANUAL requires calling the relevant update functions prior to calling the read functions
+
+  timer.setInterval(25, updateStepCounter);
+  
   Serial.println("Arduino is ready...");
 }
 
-void loop()
-{
-  if (updateSensorData)  //Keep the updating of data as a separate task
-  {
-    mySensor.updateGyro();
-    mySensor.updateCalibStatus();  //Update the Calibration Status
-    updateSensorData = false;
-  }
+void updateStepCounter(){
+  ++intervalCount;
 
-  if ((millis() - lastStreamTime) >= streamPeriod)
-  {
-    lastStreamTime = millis();
-    
-    ++intervalCount;
-
-    //Serial.println(mySensor.readGyroZ());
-    if(mySensor.readGyroX() > thresholdX && mySensor.readGyroY() > thresholdY && flag < 0){
+    if(motionSensor.readGyroX() > thresholdX && motionSensor.readGyroY() > thresholdY && flag < 0){
       if(intervalCount >= intervalCountThreshold){ 
         ++count;
         flag = 1;
@@ -51,7 +41,7 @@ void loop()
       }
     }
     
-    if(mySensor.readGyroX() < -thresholdX && mySensor.readGyroY() < -thresholdY && flag > 0){
+    if(motionSensor.readGyroX() < -thresholdX && motionSensor.readGyroY() < -thresholdY && flag > 0){
       if(intervalCount >= intervalCountThreshold){ 
         ++count;
         flag = -1;
@@ -61,5 +51,16 @@ void loop()
     }
 
     updateSensorData = true;
+}
+
+void loop()
+{
+  if (updateSensorData)  //Keep the updating of data as a separate task
+  {
+    motionSensor.updateGyro();
+    motionSensor.updateCalibStatus();  //Update the Calibration Status
+    updateSensorData = false;
   }
+
+  timer.run();
 }
