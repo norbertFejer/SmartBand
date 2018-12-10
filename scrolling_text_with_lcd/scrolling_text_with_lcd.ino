@@ -30,18 +30,18 @@ void setup()
 {
   myGLCD.InitLCD();
   myGLCD.setFont(SmallFont);
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 void loop()
 {
   myGLCD.clrScr();
-  myGLCD.print(message.substring(i,message.length()), LEFT, 16);
+  myGLCD.print(message.substring(i,message.length()), LEFT, 0);
   int s = message.length() - i;
   if(s < 14 && s > -2){
     Serial.println(s);
     //Serial.println(pos);
-    myGLCD.print(message.substring(0, pos), (14 - pos) * 6, 16);
+    myGLCD.print(message.substring(0, pos), (14 - pos) * 6, 0);
     ++pos;
     if(pos == 15){
       pos = 0;
