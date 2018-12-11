@@ -16,6 +16,10 @@ void DataProcessModule::setStepCounterModule(StepCounterModule *stepCounterModul
 	mStepCounterModule = stepCounterModule;
 }
 
+void DataProcessModule::setNotificationModule(NotificationModule *notificationModule){
+	mNotificationModule = notificationModule;
+}
+
 void DataProcessModule::processData(String data){
 	String code = data.substring(0, 1);
 	char buf[2];
@@ -39,6 +43,9 @@ void DataProcessModule::processData(String data){
 			break;
 		case 105: //i
 			i_case(data);
+			break;
+		case 110: //n
+			n_case(data);
 			break;
 	}
 
@@ -67,18 +74,29 @@ void DataProcessModule::d_case(String data){
 }
 
 void DataProcessModule::m_case(String data){
-	String message = data.substring(1, data.length());
-	//mDisplayModule->printNotification(String message);
+	String message = data.substring(1, data.length() - 1);
+	mNotificationModule->setMessage("You have one new message from " + message + "!");
+	mBluetoothCommunicationModule->setShowNotification(true);
 	Serial.println(message);
 }
 
 void DataProcessModule::p_case(String data){
-	String message = data.substring(1, data.length());
-	//mDisplayModule->printNotification(String message);
+	String message = data.substring(1, data.length() - 1);
+	mNotificationModule->setMessage(message + " is calling you...");
+	mBluetoothCommunicationModule->setShowNotification(true);
 	Serial.println(message);
 }
 
 void DataProcessModule::i_case(String data){
 	int connState = data.substring(1, data.length()).toInt();
 	mDisplayModule->printConnectionState(connState);
+}
+
+void DataProcessModule::n_case(String data){
+	String message = data.substring(1, data.length() - 1);
+	if(message = "end"){
+		mBluetoothCommunicationModule->setShowNotification(false);
+		mDisplayModule->printConnectionState(mBluetoothCommunicationModule->getConnectionState());
+	}
+	Serial.println(message);
 }

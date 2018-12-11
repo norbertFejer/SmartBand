@@ -15,7 +15,8 @@ public:
 		mMillisecond(0),
 		mSecond(0),
 		mMinute(0),
-		mDisplayModule(displayModule)
+		mDisplayModule(displayModule),
+		mRunningState(false)
 	{
 		
 	}
@@ -25,6 +26,9 @@ public:
 	}
 
 	void runStopper();
+	void resetStopper();
+	void stopStopper();
+	bool isRunning();
 
 
 private:
@@ -32,6 +36,7 @@ private:
 	int mMillisecond;
 	int mSecond;
 	int mMinute;
+	bool mRunningState;
 	DisplayModule *mDisplayModule;
 
 };

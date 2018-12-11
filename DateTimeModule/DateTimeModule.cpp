@@ -25,6 +25,8 @@ void DateTimeModule::runTimer()
 					mMonth = 0;
 				}
 			}
+			mDisplayModule->printDate(mMonth * 100 + mDay);
+			mDisplayModule->printDay(mDayArray[mDayNumCount]);
 		}
 
 		mDisplayModule->printTime(mHour * 100 + mMinute);

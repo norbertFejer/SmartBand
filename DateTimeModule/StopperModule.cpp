@@ -2,6 +2,7 @@
 
 void StopperModule::runStopper()
 {
+	mRunningState = true;
 	++mMillisecond;
 	if(mMillisecond == 60){
 		mMillisecond = 0;
@@ -18,4 +19,18 @@ void StopperModule::runStopper()
 	//Serial.println(String(mMinute) + ":" + mSecond + ":" + String(mMillisecond));
 	mDisplayModule->printStopper(mMinute, mSecond, mMillisecond);
 	delay(10);
+}
+
+void StopperModule::resetStopper(){
+	mMillisecond = 0;
+	mSecond = 0;
+	mMinute = 0;
+}
+
+bool StopperModule::isRunning(){
+	return mRunningState;
+}
+
+void StopperModule::stopStopper(){
+	mRunningState = false;
 }

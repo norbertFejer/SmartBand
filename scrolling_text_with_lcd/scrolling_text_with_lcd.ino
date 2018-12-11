@@ -20,7 +20,7 @@
 
 LCD5110 myGLCD(8,9,10,11,12);
 
-String message = "Hello World from Arduino";
+String message = "N is calling you";
 int i = 0;
 int pos;
 

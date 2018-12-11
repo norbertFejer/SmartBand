@@ -15,7 +15,8 @@ public:
 	BluetoothCommunicationModule(byte RX, byte TX, byte statePin, DataProcessModule *dataProcessModule):
 		mStatePin(statePin),
 		mConnState(0),
-		mDataProcessModule(dataProcessModule)
+		mDataProcessModule(dataProcessModule),
+		showNotification(false)
 	{
 		mSerialBtCommunication = new SoftwareSerial(RX, TX); //default 50, 51
 	}
@@ -31,6 +32,9 @@ public:
 	void initBluetoothModule();
 	void runBluetoothCommunication();
 	void sendData(String message);
+	void setShowNotification(bool state);
+	bool getShowNotification();
+	byte getConnectionState();
 
 private:
 
@@ -38,6 +42,7 @@ private:
 	byte mStatePin;
 	byte mConnState;
 	DataProcessModule *mDataProcessModule;
+	bool showNotification;
 
 	void checkConnectionState();
 

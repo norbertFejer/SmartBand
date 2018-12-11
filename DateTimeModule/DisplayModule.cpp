@@ -2,37 +2,41 @@
 
 void DisplayModule::printTime(short time)
 {
-	short hour = time / 100;
-	short minute = time % 100;
+	if(mPageNumber == 0){
 
-	mGLCD->setFont(BigNumbers);
+		short hour = time / 100;
+		short minute = time % 100;
 
-	if(hour < 10){
+		mGLCD->setFont(BigNumbers);
 
-		mGLCD->printNumI(0, LEFT, 24);
-		mGLCD->printNumI(hour, LEFT + 14, 24);
+		if(hour < 10){
 
-	}
-	else{
+			mGLCD->printNumI(0, LEFT, 24);
+			mGLCD->printNumI(hour, LEFT + 14, 24);
 
-		mGLCD->printNumI(hour, LEFT, 24);
+		}
+		else{
 
-	}
+			mGLCD->printNumI(hour, LEFT, 24);
 
-	mGLCD->setFont(SmallFont);
-	mGLCD->print(":", LEFT + 30, 34);
+		}
 
-	mGLCD->setFont(BigNumbers);
+		mGLCD->setFont(SmallFont);
+		mGLCD->print(":", LEFT + 30, 34);
 
-	if(minute < 10){
+		mGLCD->setFont(BigNumbers);
 
-		mGLCD->printNumI(0, LEFT + 36, 24);
-		mGLCD->printNumI(minute, LEFT + 50, 24);
+		if(minute < 10){
 
-	}
-	else{
+			mGLCD->printNumI(0, LEFT + 36, 24);
+			mGLCD->printNumI(minute, LEFT + 50, 24);
 
-		mGLCD->printNumI(minute, LEFT + 36, 24);
+		}
+		else{
+
+			mGLCD->printNumI(minute, LEFT + 36, 24);
+
+		}
 
 	}
 }
@@ -47,49 +51,53 @@ void DisplayModule::initDisplayModule()
 	printStepCounterValue(0);
 	printConnectionState(0);
 
-	//mThread.onRun( [*this](){ this.startTimer(); } );
-  	//mThread.setInterval(5);
-  	//mTimer.setInterval(500, this { btModule.runBluetoothCommunication();} );
 }
 
 void DisplayModule::printDate(short date)
 {
-	short month = date / 100;
-	short day = date % 100;
-	mGLCD->setFont(SmallFont);
+	if(mPageNumber == 0){
 
-	if(month < 10){
+		short month = date / 100;
+		short day = date % 100;
+		mGLCD->setFont(SmallFont);
 
-		mGLCD->printNumI(0, LEFT, 18);
-		mGLCD->printNumI(month, LEFT + 6, 18);
+		if(month < 10){
+
+			mGLCD->printNumI(0, LEFT, 18);
+			mGLCD->printNumI(month, LEFT + 6, 18);
+
+		}
+		else{
+
+			mGLCD->printNumI(month, LEFT, 18);
+
+		}
+
+		mGLCD->print(".", LEFT + 12, 18);
+
+		if(day < 10){
+
+			mGLCD->printNumI(0, LEFT + 18, 18);
+			mGLCD->printNumI(day, LEFT + 24, 18);
+
+		}
+		else{
+
+			mGLCD->printNumI(day, LEFT + 18, 18);
+
+		}
 
 	}
-	else{
-
-		mGLCD->printNumI(month, LEFT, 18);
-
-	}
-
-	mGLCD->print(".", LEFT + 12, 18);
-
-	if(day < 10){
-
-		mGLCD->printNumI(0, LEFT + 18, 18);
-		mGLCD->printNumI(day, LEFT + 24, 18);
-
-	}
-	else{
-
-		mGLCD->printNumI(day, LEFT + 18, 18);
-
-	}
-
 }
 
 void DisplayModule::printDay(String day)
 {
-	mGLCD->setFont(SmallFont);
-	mGLCD->print(day, RIGHT, 34);
+	if(mPageNumber == 0){
+
+		mGLCD->setFont(SmallFont);
+		mGLCD->print(day, RIGHT, 34);
+
+	}
 }
 
 void DisplayModule::printConnectionState(byte connState)
@@ -110,44 +118,8 @@ void DisplayModule::printStepCounterValue(int stepCount){
 	mGLCD->printNumI(stepCount, RIGHT, 18);
 }
 
-void DisplayModule::printMessage(){
-
-	mGLCD->setFont(SmallFont);
-	mGLCD->clrRow(0, 0);
-	mGLCD->print(mMessage.substring(mStrIterator, mMessage.length()), LEFT, 0);
-
-	int tmpPos = mMessage.length() - mStrIterator;
-
-	if(tmpPos < 14 && tmpPos > -2){
-
-		mGLCD->print(mMessage.substring(0, mStrPos), (14 - mStrPos) * 6, 0);
-		++mStrPos;
-
-		if(mStrPos == 15){
-		  mStrPos = 0;
-		}
-
-	}
-
-	++mStrIterator;
-
-	if((mStrIterator > mMessage.length() && mStrIterator % 15 == 0) || tmpPos < 0){
-
-		mStrIterator = 0;
-
-	}
-
-}
-
-void DisplayModule::printNotification(String message){
-	mMessage = message;
-}
-
-void DisplayModule::startTimer(){
-	mTimer.run();
-}
-
 void DisplayModule::printStopper(int min, int sec, int msec){
+
 	mGLCD->setFont(BigNumbers);
 
 	if(min < 10){
@@ -190,4 +162,33 @@ void DisplayModule::printStopper(int min, int sec, int msec){
 		mGLCD->printNumI(msec, LEFT + 66, 36);
 
 	}
+}
+
+LCD5110* DisplayModule::getLCD(){
+	return mGLCD;
+}
+
+void DisplayModule::setPageNumber(byte pageNum){
+	mPageNumber = pageNum;
+}
+
+byte DisplayModule::getPageNumber(){
+	return mPageNumber;
+}
+
+void DisplayModule::clearStopperDisplayArea(){
+	mGLCD->clrRow(2, 0, 32);
+	mGLCD->clrRow(3, 0);
+	mGLCD->clrRow(4, 0);
+	mGLCD->clrRow(5, 0);
+	mGLCD->setFont(SmallFont);
+	mGLCD->print("Timer:", LEFT, 18);
+}
+
+void DisplayModule::clearMainWindowArea(){
+	mGLCD->clrRow(2, 0, 40);
+	mGLCD->clrRow(3, 0);
+	mGLCD->clrRow(4, 0);
+	mGLCD->clrRow(5, 0);
+	mGLCD->setFont(SmallFont);
 }
