@@ -7,7 +7,7 @@
     tools:context=".LineChartActivity">
 
     <lecho.lib.hellocharts.view.LineChartView
-        android:id="@+id/chart"
+        android:id="@+id/LineChartView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
