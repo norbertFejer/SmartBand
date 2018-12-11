@@ -9,10 +9,11 @@ void StepCounterModule::runStepCounter()
 
 		if(mIntervalCount >= mIntervalCountThreshold){ 
 
-		  ++mStepCount;
-		  mFlag = 1;
-		  mIntervalCount = 0;
-		  Serial.println(mStepCount);
+			++mStepCount;
+			mFlag = 1;
+			mIntervalCount = 0;
+			mDispayModule->printStepCounterValue(mStepCount);
+
 		}
 
 	}
@@ -21,12 +22,17 @@ void StepCounterModule::runStepCounter()
 
 		if(mIntervalCount >= mIntervalCountThreshold){ 
 
-		  ++mStepCount;
-		  mFlag = -1;
-		  mIntervalCount = 0;
-		  Serial.println(mStepCount);
+			++mStepCount;
+			mFlag = -1;
+			mIntervalCount = 0;
+			mDispayModule->printStepCounterValue(mStepCount);
+
 		}
 
+	}
+
+	if(mStepCount == INT_MAX){
+		mStepCount = 0;
 	}
 
 	mUpdateSensorData = true;
@@ -54,6 +60,9 @@ void StepCounterModule::updateSensor(){
 
 void StepCounterModule::setStepCounter(int stepCount){
 
-	mStepCount = stepCount;
+	if(stepCount >= 0 && stepCount < INT_MAX){
+		mStepCount = stepCount;
+		mDispayModule->printStepCounterValue(mStepCount);
+	}
 	
 }

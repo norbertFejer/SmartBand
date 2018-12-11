@@ -50,24 +50,20 @@ void DataProcessModule::sendDataToBluetoothModule(String message){
 
 void DataProcessModule::s_case(String data){
 	int stepCount = data.substring(1, data.length()).toInt();
-	//mStepCounterModule->setStepCounter(stepCount);
-	Serial.println(stepCount);
+	mStepCounterModule->setStepCounter(stepCount);
 }
 
 void DataProcessModule::t_case(String data){
 	String time = data.substring(1, data.length());
-	//mDateTimeModule->setTime(time);
-	Serial.println(time);
+	mDateTimeModule->setTime(time);
 }
 
 void DataProcessModule::d_case(String data){
 	String date = data.substring(1, 5);
-	//mDateTimeModule->setDate(date)
-	Serial.println(date);
+	mDateTimeModule->setDate(date);
 
 	int dayNum = data.substring(5, data.length()).toInt();
-	//mDateTimeModule->setDayNumCount(dayNum);
-	Serial.println(dayNum);
+	mDateTimeModule->setDayNumCount(dayNum);
 }
 
 void DataProcessModule::m_case(String data){
@@ -85,5 +81,4 @@ void DataProcessModule::p_case(String data){
 void DataProcessModule::i_case(String data){
 	int connState = data.substring(1, data.length()).toInt();
 	mDisplayModule->printConnectionState(connState);
-	//Serial.println("i_case");
 }

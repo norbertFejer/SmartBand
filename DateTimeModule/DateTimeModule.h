@@ -2,19 +2,21 @@
 #define DATETIMEMODULE_H
 
 #include <Arduino.h>
+#include "DisplayModule.h"
 
 class DateTimeModule
 {
 
 public:
 	
-	DateTimeModule() :
+	DateTimeModule(DisplayModule *displayModule) :
 		mSec(0),
 		mHour(0),
 		mMinute(0),
 		mMonth(1),
 		mDay(1),
-		mDayNumCount(0)
+		mDayNumCount(0),
+		mDisplayModule(displayModule)
 	{
 	}
 
@@ -40,6 +42,7 @@ private:
 	byte mDay;
 	byte mDayNumCount;
 	String mDayArray[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+	DisplayModule *mDisplayModule;
 
 	byte getMaxDayNum();
 

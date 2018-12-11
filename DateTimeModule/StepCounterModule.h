@@ -4,20 +4,23 @@
 #include <Arduino.h>
 #include "NineAxesMotion.h"
 #include "Wire.h"
+#include <limits.h>
+#include "DisplayModule.h"
 
 class StepCounterModule
 {
 
 public:
 	
-	StepCounterModule(byte thresholdX, byte thresholdY, byte intervalCountThreshold) :
+	StepCounterModule(byte thresholdX, byte thresholdY, byte intervalCountThreshold, DisplayModule *displayModule) :
 		mThresholdX(thresholdX),
 		mThresholdY(thresholdY),
 		mIntervalCountThreshold(intervalCountThreshold),
 		mStepCount(0),
 		mUpdateSensorData(true),
 		mFlag(-1),
-		mIntervalCount(0)
+		mIntervalCount(0),
+		mDispayModule(displayModule)
 	{
 	}
 
@@ -41,6 +44,7 @@ private:
 	byte mThresholdY;
 	byte mIntervalCount;
 	byte mIntervalCountThreshold;
+	DisplayModule *mDispayModule;
 
 };
 

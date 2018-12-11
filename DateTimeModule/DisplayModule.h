@@ -38,6 +38,7 @@ public:
 	void printConnectionState(byte connState);
 	void printStepCounterValue(int stepCount);
 	void printNotification(String message);
+	void printStopper(int min, int sec, int msec);
 
 private:
 

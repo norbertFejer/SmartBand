@@ -41,7 +41,13 @@ void DisplayModule::initDisplayModule()
 {
 	mGLCD->InitLCD();
 
-	//mThread.onRun( [this](){ startTimer(); } );
+	printTime(0);
+	printDate(101);
+	printDay("MON");
+	printStepCounterValue(0);
+	printConnectionState(0);
+
+	//mThread.onRun( [*this](){ this.startTimer(); } );
   	//mThread.setInterval(5);
   	//mTimer.setInterval(500, this { btModule.runBluetoothCommunication();} );
 }
@@ -77,6 +83,7 @@ void DisplayModule::printDate(short date)
 		mGLCD->printNumI(day, LEFT + 18, 18);
 
 	}
+
 }
 
 void DisplayModule::printDay(String day)
@@ -98,6 +105,7 @@ void DisplayModule::printConnectionState(byte connState)
 }
 
 void DisplayModule::printStepCounterValue(int stepCount){
+	mGLCD->clrRow(2, 42);
 	mGLCD->setFont(SmallFont);
 	mGLCD->printNumI(stepCount, RIGHT, 18);
 }
@@ -137,4 +145,49 @@ void DisplayModule::printNotification(String message){
 
 void DisplayModule::startTimer(){
 	mTimer.run();
+}
+
+void DisplayModule::printStopper(int min, int sec, int msec){
+	mGLCD->setFont(BigNumbers);
+
+	if(min < 10){
+
+		mGLCD->printNumI(0, LEFT, 24);
+		mGLCD->printNumI(min, LEFT + 14, 24);
+
+	}
+	else{
+
+		mGLCD->printNumI(min, LEFT, 24);
+
+	}
+
+	mGLCD->setFont(SmallFont);
+	mGLCD->print(":", LEFT + 30, 34);
+
+	mGLCD->setFont(BigNumbers);
+	if(sec < 10){
+
+		mGLCD->printNumI(0, LEFT + 36, 24);
+		mGLCD->printNumI(sec, LEFT + 50, 24);
+
+	}
+	else{
+
+		mGLCD->printNumI(sec, LEFT + 36, 24);
+
+	}
+
+	mGLCD->setFont(SmallFont);
+	if(msec < 10){
+
+		mGLCD->printNumI(0, LEFT + 66, 36);
+		mGLCD->printNumI(msec, LEFT + 72, 36);
+
+	}
+	else{
+
+		mGLCD->printNumI(msec, LEFT + 66, 36);
+
+	}
 }

@@ -26,6 +26,8 @@ void DateTimeModule::runTimer()
 				}
 			}
 		}
+
+		mDisplayModule->printTime(mHour * 100 + mMinute);
 	}
 
 	++mSec;
@@ -78,33 +80,46 @@ byte DateTimeModule::getMaxDayNum()
 
 void DateTimeModule::setDate(String date)
 {
-	String month = date.substring(0, date.indexOf("."));
-	date.remove(0, date.indexOf(".") + 1);
-	if(month.toInt() > 0 && month.toInt() < 13){
-		mMonth = month.toInt();
-	}
-	if(date.toInt() > 0 && date.toInt() <= getMaxDayNum()){
-		mDay = date.toInt();
+	if(date.length() == 4){
+
+		String month = date.substring(0, 2);
+		if(month.toInt() > 0 && month.toInt() < 13){
+			mMonth = month.toInt();
+		}
+		
+		date = date.substring(2, 4);
+		if(date.toInt() > 0 && date.toInt() <= getMaxDayNum()){
+			mDay = date.toInt();
+		}
+
+		mDisplayModule->printDate(mMonth * 100 + mDay);
+
 	}
 }
 
 void DateTimeModule::setTime(String time)
 {
-	String hour = time.substring(0, time.indexOf("."));
-	time.remove(0, time.indexOf(".") + 1);
-	if(hour.toInt() >= 0 && hour.toInt() < 23){
-		mHour = hour.toInt();
+	if(time.length() == 5){
+		String hour = time.substring(0, 2);
+		if(hour.toInt() >= 0 && hour.toInt() < 23){
+			mHour = hour.toInt();
+		}
+		time = time.substring(2, time.length());
+		if(time.toInt() >= 0 && time.toInt() < 61){
+			mMinute = time.toInt();
+		}
+		mSec = 0;
+		
+		mDisplayModule->printTime(mHour * 100 + mMinute);
+
 	}
-	if(time.toInt() >= 0 && time.toInt() < 61){
-		mMinute = time.toInt();
-	}
-	mSec = 0;
 }
 
 void DateTimeModule::setDayNumCount(byte num)
 {
 	if(num >= 0 && num < 7){
 		mDayNumCount = num;
+		mDisplayModule->printDay(getDay());
 	}
 }
 
