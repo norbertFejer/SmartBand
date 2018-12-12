@@ -10,9 +10,9 @@
 
 DisplayModule displayModule(8, 9, 10, 11, 12);
 DateTimeModule dateTimeModule(&displayModule);
-StepCounterModule stepCounterModule(32, 36, 4, &displayModule);
 DataProcessModule dataProcessModule;
 BluetoothCommunicationModule btcModule(50, 51, 3, &dataProcessModule);
+StepCounterModule stepCounterModule(32, 36, 4, &displayModule, &btcModule);
 StopperModule stopperModule(&displayModule);
 NotificationModule notificationModule(displayModule.getLCD());
 
@@ -30,8 +30,14 @@ int pageBtnValue = 1;
 int confirmBtnValue = 1;
 
 int pageNumber = 0;
-int longPressCount = 0;
-bool longPressed = false;
+bool confirmBtnPressed = false;
+unsigned long confirmBtnTimer = 0;
+bool isStopperRunnable = false;
+bool resetStopper = false;
+
+int confirmBtnState = 0;
+  // 0 - unpressed
+  // 1 - pressed
 
 void startTimeTimer(){
   timeTimer.run();
@@ -55,8 +61,8 @@ void setup() {
 
   //timer
   timeThread.onRun(startTimeTimer);
-  timeThread.setInterval(5);
-  timeTimer.setInterval(10, [&dateTimeModule](){ dateTimeModule.runTimer();} );
+  timeThread.setInterval(1);
+  timeTimer.setInterval(1000, [&dateTimeModule](){ dateTimeModule.runTimer();} );
 
   //step counter
   stepCounterModule.initSensor();
@@ -82,10 +88,13 @@ void setup() {
 
 void loop() {
   //---------------
+  
   if(timeThread.shouldRun()){
     timeThread.run();
   }
+  
   //---------------
+  
   if(btcModule.getShowNotification()){
     
     if(notificationThread.shouldRun()){
@@ -93,17 +102,25 @@ void loop() {
     }
      
   }
+  
   //---------------
+  
   stepCounterModule.updateSensor();
+  
   //---------------
+  
   if(stepCounterThread.shouldRun()){
     stepCounterThread.run();
   }
+  
   //---------------
+  
   if(btcThread.shouldRun()){
     btcThread.run();
+    
   }
   //---------------
+  
   int actualPageBtnValue = digitalRead(pageBtnPin);
   if(actualPageBtnValue != pageBtnValue && pageBtnValue == 1){
     ++pageNumber;
@@ -118,42 +135,52 @@ void loop() {
       displayModule.clearMainWindowArea();
       displayModule.printDate(dateTimeModule.getDate());
       displayModule.printDay(dateTimeModule.getDay());
+      displayModule.printTime(dateTimeModule.getTime());
     }
     else{
       displayModule.clearStopperDisplayArea();
+      stopperModule.resetStopper();
+      displayModule.printStopper(0,0,0);
     }
   }
   
   if(actualPageBtnValue == 1){
     pageBtnValue = 1;
   }
-
-  /*if(pageNumber == 1){
-    stopperModule.runStopper();
-  }*/
-  //---------------
-  int actualConfirmBtnValue = digitalRead(confirmBtnPin);
-  if(actualConfirmBtnValue != confirmBtnValue && confirmBtnValue == 1){
-    
-    confirmBtnValue = actualConfirmBtnValue;
-    longPressCount = 0;
-    Serial.println("pressed");
-  }
   
-  if(actualConfirmBtnValue == 1){
-    confirmBtnValue = 1;
+  //---------------
+  
+  int actualConfirmBtnValue = digitalRead(confirmBtnPin);
+  if(actualConfirmBtnValue == 0 && confirmBtnPressed == false){
+    confirmBtnTimer = millis();
+    confirmBtnPressed = true;
   }
+  if(actualConfirmBtnValue != confirmBtnValue && confirmBtnValue == 0){
+    if(millis() - confirmBtnTimer > 250){
+      resetStopper = true;
+      Serial.println("long pressed");
+    }
+    else{
+      confirmBtnState = 1;
+      isStopperRunnable = !isStopperRunnable;
+      Serial.println("pressed");
+    }
+    confirmBtnPressed = false;
+    confirmBtnTimer = 0;
+  }
+  confirmBtnValue = actualConfirmBtnValue;
 
-  if(actualConfirmBtnValue == 0){
-    ++longPressCount;
-  }
-  else{
-    longPressCount = 0;
-    longPressed = false;
-  }
+  //---------------
 
-  if(longPressCount > 150 && longPressed == false){
-    Serial.println("long pressed");
-    longPressed = true;
+  if(pageNumber == 1){
+    if(resetStopper){
+     stopperModule.resetStopper();
+     resetStopper = false;
+     displayModule.printStopper(0,0,0);
+     isStopperRunnable = false;
+    }
+    if(isStopperRunnable){
+      stopperModule.runStopper();
+    }
   }
 }

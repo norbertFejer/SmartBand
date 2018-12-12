@@ -13,6 +13,7 @@ void StepCounterModule::runStepCounter()
 			mFlag = 1;
 			mIntervalCount = 0;
 			mDispayModule->printStepCounterValue(mStepCount);
+			mBtcModule->sendData(String(mStepCount));
 
 		}
 
@@ -26,6 +27,7 @@ void StepCounterModule::runStepCounter()
 			mFlag = -1;
 			mIntervalCount = 0;
 			mDispayModule->printStepCounterValue(mStepCount);
+			mBtcModule->sendData(String(mStepCount));
 
 		}
 

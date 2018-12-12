@@ -2,11 +2,13 @@
 #define DATAPROCESSMODULE_H
 
 #include <Arduino.h>
+#include "StepCounterModule.h"
 #include "BluetoothCommunicationModule.h"
 #include "DisplayModule.h"
 #include "DateTimeModule.h"
-#include "StepCounterModule.h"
 #include "NotificationModule.h"
+
+class StepCounterModule;
 
 class BluetoothCommunicationModule;
 
@@ -40,10 +42,10 @@ public:
 
 private:
 
+	StepCounterModule *mStepCounterModule;
 	BluetoothCommunicationModule *mBluetoothCommunicationModule;
 	DisplayModule *mDisplayModule;
 	DateTimeModule *mDateTimeModule;
-	StepCounterModule *mStepCounterModule;
 	NotificationModule *mNotificationModule;
 
 };

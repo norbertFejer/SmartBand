@@ -6,13 +6,17 @@
 #include "Wire.h"
 #include <limits.h>
 #include "DisplayModule.h"
+#include "BluetoothCommunicationModule.h"
+
+class BluetoothCommunicationModule;
 
 class StepCounterModule
 {
 
 public:
 	
-	StepCounterModule(byte thresholdX, byte thresholdY, byte intervalCountThreshold, DisplayModule *displayModule) :
+	StepCounterModule(byte thresholdX, byte thresholdY, byte intervalCountThreshold, 
+			DisplayModule *displayModule, BluetoothCommunicationModule *btcModule) :
 		mThresholdX(thresholdX),
 		mThresholdY(thresholdY),
 		mIntervalCountThreshold(intervalCountThreshold),
@@ -20,7 +24,8 @@ public:
 		mUpdateSensorData(true),
 		mFlag(-1),
 		mIntervalCount(0),
-		mDispayModule(displayModule)
+		mDispayModule(displayModule),
+		mBtcModule(btcModule)
 	{
 	}
 
@@ -45,6 +50,7 @@ private:
 	byte mIntervalCount;
 	byte mIntervalCountThreshold;
 	DisplayModule *mDispayModule;
+	BluetoothCommunicationModule *mBtcModule;
 
 };
 

@@ -8,6 +8,7 @@ void BluetoothCommunicationModule::runBluetoothCommunication()
 	if (mSerialBtCommunication->available() > 0){
 		String receivedStr = mSerialBtCommunication->readStringUntil('\n');
 		mDataProcessModule->processData(receivedStr);
+		Serial.println(receivedStr);
 	}
 
 	if (Serial.available()){
