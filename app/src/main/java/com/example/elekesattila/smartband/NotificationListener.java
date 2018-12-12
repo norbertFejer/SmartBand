@@ -17,6 +17,7 @@ public class NotificationListener extends BroadcastReceiver {
     private static int lastState = TelephonyManager.CALL_STATE_IDLE;
     private String number;
     private Context context;
+    private Boolean notificationSent = false;
 
     @Override
     public void onReceive(Context ctx, Intent intent) {
@@ -70,8 +71,9 @@ public class NotificationListener extends BroadcastReceiver {
         switch (state) {
             case TelephonyManager.CALL_STATE_RINGING:
                 Log.d(TAG, "Incoming call, ringing: " + number);
-                if (notificationBinder != null){
-                    notificationBinder.callReceived(number);;
+                if (notificationBinder != null && !notificationSent){
+                    notificationBinder.callReceived(number);
+                    notificationSent = true;
                 }
                 else{
                     Log.d(TAG, "NotificationBinder is null.");
@@ -81,6 +83,7 @@ public class NotificationListener extends BroadcastReceiver {
                 Log.d(TAG, "Incoming call, end: " + number);
                 if (notificationBinder != null){
                     notificationBinder.callReceived("end");
+                    notificationSent = false;
                 }
                 else{
                     Log.d(TAG, "NotificationBinder is null.");

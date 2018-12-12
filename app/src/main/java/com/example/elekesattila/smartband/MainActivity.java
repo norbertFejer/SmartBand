@@ -7,24 +7,30 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SmartBandMainActivity";
-    private Button sendButton, chartButton, connectButton;
-    private SenderClass senderClass = new SenderClass();
     private static MessageHandler handler = new MessageHandler();
+    private static int stepCount;
+    private Button deleteButton, chartButton, connectButton, disconnectButton;
+    private static TextView stepCountView;
+    private static SenderClass senderClass = new SenderClass();
     private BluetoothReceiverThread btrThread;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sendButton = (Button) findViewById(R.id.SendButton);
+        deleteButton = (Button) findViewById(R.id.DeleteButton);
         chartButton = (Button) findViewById(R.id.ChartButton);
         connectButton = (Button) findViewById(R.id.ConnectButton);
+        stepCountView = (TextView) findViewById(R.id.StepCountView);
+        disconnectButton = (Button) findViewById(R.id.DisconnectButton);
 
         NotificationListener.setBindListener(new NotificationBinder() {
             @Override
@@ -52,8 +58,13 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Connected.", Toast.LENGTH_SHORT).show();
                             btrThread = new BluetoothReceiverThread(senderClass.getBluetoothSocket(), handler);
                             btrThread.start();
-                            //senderClass.sendTime();
-                            //senderClass.sendDate();
+                            senderClass.sendTime();
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException e) {
+                                Log.d(TAG, "Delay interrupted.");
+                            }
+                            senderClass.sendDate();
                         }
                         else{
                             Log.d(TAG, "Connection failed.");
@@ -64,29 +75,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        sendButton.setOnClickListener(new View.OnClickListener(){
+        deleteButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View V){
-                RadioButton stepCountRB = (RadioButton) findViewById(R.id.stepCount);
-                RadioButton timeRB = (RadioButton) findViewById(R.id.time);
-                RadioButton dateRB = (RadioButton) findViewById(R.id.date);
-                RadioButton smsRB = (RadioButton) findViewById(R.id.sms);
-                RadioButton callRB = (RadioButton) findViewById(R.id.call);
-
-                if (stepCountRB.isChecked()){
-                    senderClass.sendStepCount(150);
-                }
-                if (timeRB.isChecked()){
-                    senderClass.sendTime();
-                }
-                if (dateRB.isChecked()){
-                    senderClass.sendDate();
-                }
-                if (smsRB.isChecked()){
-                    senderClass.sendMessageNotification("Norbert");
-                }
-                if (callRB.isChecked()){
-                    senderClass.sendIncomingPhoneCallNotification("Norbert");
-                }
+                new StepChartData().deleteFile();
             }
         });
 
@@ -96,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LineChartActivity.class);
                 Log.d (TAG, "Starting LineChartActivity.");
                 startActivity(intent);
+            }
+        });
+
+        disconnectButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View V){
+               disconnect();
             }
         });
 
@@ -123,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*private void disconnect(){
+    private void disconnect(){
         if (senderClass.getBluetoothSocket()!=null){
             try{
                 senderClass.getBluetoothSocket().close();
@@ -136,5 +133,20 @@ public class MainActivity extends AppCompatActivity {
         else{
             Log.d(TAG, "Cannot disconnect, device is not connected.");
         }
-    }*/
+    }
+
+    public static int getStepCount() {
+        return stepCount;
+    }
+
+    public static void setStepCount(int stepCount) {
+        if (MainActivity.stepCount < stepCount){
+            MainActivity.stepCount += stepCount;
+            senderClass.sendStepCount(MainActivity.stepCount);
+        }
+        else{
+            MainActivity.stepCount = stepCount;
+        }
+        stepCountView.setText("Actual steps: " + MainActivity.stepCount);
+    }
 }

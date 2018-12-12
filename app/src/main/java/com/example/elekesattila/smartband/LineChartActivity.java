@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.Viewport;
@@ -22,24 +23,25 @@ public class LineChartActivity extends AppCompatActivity{
         setContentView(R.layout.activity_line_chart);
         Log.d (TAG, "LineChartActivity started.");
         lineChartView = findViewById(R.id.LineChartView);
-        stepChartData = new StepChartData(this.getBaseContext());
+        stepChartData = new StepChartData();
 
         try{
             Log.d(TAG, "Trying to load chart data.");
             stepChartData.setChartData();
+            updateChartData(new SimpleDateFormat("MMmdd").toString(), MainActivity.getStepCount());
             lineChartData = stepChartData.getLineChartData();
         }
         catch (IOException e){
             Log.d(TAG, "Error loading chart data.");
         }
 
-        if (lineChartData != null){
+        if (lineChartData != null && !stepChartData.isNewFile()){
             try{
                 Log.d(TAG, "Trying to set chart data.");
                 lineChartView.setLineChartData(lineChartData);
 
                 Viewport viewport = new Viewport(lineChartView.getMaximumViewport());
-                viewport.top=12;
+                viewport.top=stepChartData.getMaxStep() + 1;
                 lineChartView.setMaximumViewport(viewport);
                 lineChartView.setCurrentViewport(viewport);
             }catch (Exception e){
@@ -47,12 +49,12 @@ public class LineChartActivity extends AppCompatActivity{
             }
         }
         else{
-            Log.d(TAG, "Null chart data.");
+            Log.d(TAG, "Null chart data or nothing to show.");
             finish();
         }
     }
 
-    public void addNewData(String newXData, Integer newYData){
+    private void updateChartData(String newXData, Integer newYData){
         stepChartData.saveData(newXData, newYData);
     }
 }

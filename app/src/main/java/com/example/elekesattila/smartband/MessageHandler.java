@@ -18,6 +18,7 @@ public class MessageHandler extends Handler {
                 if (endOfLineIndex > 0) {
                     stringBuilder.delete(0, stringBuilder.length());
                 }
+                MainActivity.setStepCount(Integer.parseInt(stringBuilder.toString()));
                 Log.d(TAG, "...String:"+ stringBuilder.toString() +  "Byte:" + msg.arg1 + "...");
                 break;
         }

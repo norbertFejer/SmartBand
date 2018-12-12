@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,25 +26,27 @@ import lecho.lib.hellocharts.model.PointValue;
 
 public class StepChartData {
     private static final String TAG = "SmartBandStepChartData";
-    private Context context;
     private LineChartData data;
     private File file;
     private String xAxisLine, yAxisLine, path;
+    String[] xAxisData, yAxisData;
+    private Boolean newFile;
 
-    StepChartData(Context ctx){
-        this.context = ctx;
+    StepChartData(){
         this.data = new LineChartData();
         this.path = Environment.getExternalStorageDirectory().getAbsolutePath();
         this.file = new File(path, "smart_band_chart_data.txt");
         Log.d(TAG, "Input file: " + file.getPath());
         this.xAxisLine = null;
         this.yAxisLine = null;
+        this.xAxisData = null;
+        this.yAxisData = null;
+        this.newFile = false;
     }
 
     public void setChartData() throws IOException {
 
         Log.d(TAG, "Starting setChartData");
-        String[] xAxisData, yAxisData;
         List xAxisValues = new ArrayList();
         List yAxisValues = new ArrayList();
 
@@ -54,7 +58,6 @@ public class StepChartData {
                 InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 xAxisLine = bufferedReader.readLine();
-
                 yAxisLine = bufferedReader.readLine();
 
                 bufferedReader.close();
@@ -96,7 +99,7 @@ public class StepChartData {
         }
         else{
             file.createNewFile();
-            //saveData("A B C D E F", "1 2 3 4 5 6");
+            newFile = true;
             Log.d(TAG, "Input file created.");
         }
     }
@@ -107,24 +110,52 @@ public class StepChartData {
 
     public void saveData(String newXData, Integer newYData) {
         Log.d(TAG, "Saving data.");
-        file.setWritable(true);
-        String newXAxisLine = xAxisLine + newXData;
-        String newYAxisLine = yAxisLine + newYData.toString();
+        if (newFile){
+            xAxisLine = newXData;
+            yAxisLine = newYData.toString();
+        }
+        else {
+            DateFormat todayDate = new SimpleDateFormat("MMmdd");
+            if (xAxisData[xAxisData.length-1].equals(todayDate.toString())){
+                if (newYData > Integer.parseInt(yAxisData[yAxisData.length-1])){
+                    yAxisData[yAxisData.length-1] = newYData.toString();
+                }
+            }
+            else{
+                xAxisLine = xAxisLine + newXData;
+                yAxisLine = yAxisLine + newYData.toString();
+            }
+        }
         PrintWriter writer = null;
         try {
+            file.setWritable(true);
             writer = new PrintWriter(file);
         } catch (FileNotFoundException e) {
             Log.d(TAG, "File not found.");
         }
-        writer.println(newXAxisLine);
-        writer.println(newYAxisLine);
+        writer.println(xAxisLine);
+        writer.println(yAxisLine);
         writer.close();
+        newFile = false;
         Log.d(TAG, "Data saved.");
     }
 
     public void deleteFile(){
         file.delete();
         Log.d(TAG, "Data deleted.");
-        //Toast.makeText(context, "Data deleted.", Toast.LENGTH_SHORT).show();
+    }
+
+    public Boolean isNewFile() {
+        return newFile;
+    }
+
+    public int getMaxStep(){
+        int maxStep = 0;
+        for (int i=0; i<yAxisData.length; ++i){
+            if (maxStep < Integer.parseInt(yAxisData[i])){
+                maxStep = Integer.parseInt(yAxisData[i]);
+            }
+        }
+        return maxStep;
     }
 }
