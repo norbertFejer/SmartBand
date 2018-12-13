@@ -192,3 +192,11 @@ void DisplayModule::clearMainWindowArea(){
 	mGLCD->clrRow(5, 0);
 	mGLCD->setFont(SmallFont);
 }
+
+void DisplayModule::turnOnBacklight(){
+	pinMode(mBackLightPin, HIGH);
+}
+
+void DisplayModule::turnOffBacklight(){
+	pinMode(mBackLightPin, LOW);
+}

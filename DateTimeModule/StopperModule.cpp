@@ -34,3 +34,15 @@ bool StopperModule::isRunning(){
 void StopperModule::stopStopper(){
 	mRunningState = false;
 }
+
+int StopperModule::getMinute(){
+	return mMinute;
+}
+
+int StopperModule::getSecond(){
+	return mSecond;
+}
+
+int StopperModule::getMilliseconds(){
+	return mMillisecond;
+}

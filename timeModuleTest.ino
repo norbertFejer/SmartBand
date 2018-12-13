@@ -8,7 +8,7 @@
 #include <Thread.h>
 #include <SimpleTimer.h>
 
-DisplayModule displayModule(8, 9, 10, 11, 12);
+DisplayModule displayModule(8, 9, 10, 11, 12, 2);
 DateTimeModule dateTimeModule(&displayModule);
 DataProcessModule dataProcessModule;
 BluetoothCommunicationModule btcModule(50, 51, 3, &dataProcessModule);
@@ -139,8 +139,9 @@ void loop() {
     }
     else{
       displayModule.clearStopperDisplayArea();
-      stopperModule.resetStopper();
-      displayModule.printStopper(0,0,0);
+      displayModule.printStopper(stopperModule.getMinute(),
+                                stopperModule.getSecond(),
+                                stopperModule.getMilliseconds());
     }
   }
   
@@ -172,7 +173,15 @@ void loop() {
 
   //---------------
 
-  if(pageNumber == 1){
+  if(pageNumber == 0){
+    if(confirmBtnState == 1){
+      btcModule.setShowNotification(false);
+      displayModule.printConnectionState(btcModule.getConnectionState());
+      displayModule.turnOffBacklight();
+      confirmBtnState = 0;
+    }
+  }
+  else{
     if(resetStopper){
      stopperModule.resetStopper();
      resetStopper = false;

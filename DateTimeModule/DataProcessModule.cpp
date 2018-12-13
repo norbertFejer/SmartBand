@@ -77,6 +77,7 @@ void DataProcessModule::m_case(String data){
 	String message = data.substring(1, data.length() - 1);
 	mNotificationModule->setMessage("You have one new message from " + message + "!");
 	mBluetoothCommunicationModule->setShowNotification(true);
+	mDisplayModule->turnOnBacklight();
 	Serial.println(message);
 }
 
@@ -84,6 +85,7 @@ void DataProcessModule::p_case(String data){
 	String message = data.substring(1, data.length() - 1);
 	mNotificationModule->setMessage(message + " is calling you...");
 	mBluetoothCommunicationModule->setShowNotification(true);
+	mDisplayModule->turnOnBacklight();
 	Serial.println(message);
 }
 
@@ -97,6 +99,7 @@ void DataProcessModule::n_case(String data){
 	if(message = "end"){
 		mBluetoothCommunicationModule->setShowNotification(false);
 		mDisplayModule->printConnectionState(mBluetoothCommunicationModule->getConnectionState());
+		mDisplayModule->turnOffBacklight();
 	}
 	Serial.println(message);
 }

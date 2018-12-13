@@ -29,7 +29,9 @@ public:
 	void resetStopper();
 	void stopStopper();
 	bool isRunning();
-
+	int getMinute();
+	int getSecond();
+	int getMilliseconds();
 
 private:
 
