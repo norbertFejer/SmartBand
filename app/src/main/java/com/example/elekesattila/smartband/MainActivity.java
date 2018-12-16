@@ -1,24 +1,27 @@
 package com.example.elekesattila.smartband;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RadioButton;
+import android.widget.CompoundButton;
+import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SmartBandMainActivity";
-    private static MessageHandler handler = new MessageHandler();
     private static int stepCount;
-    private Button deleteButton, chartButton, connectButton, disconnectButton;
-    private static TextView stepCountView;
+    private Button deleteButton, chartButton;
+    private Switch connectSwitch;
+    private static TextView stepCountView, caloriesView;
+    private static ProgressBar stepProgressBar, caloriesProgressbar;
+    private static MessageHandler handler = new MessageHandler();
     private static SenderClass senderClass = new SenderClass();
     private BluetoothReceiverThread btrThread;
 
@@ -28,9 +31,13 @@ public class MainActivity extends AppCompatActivity {
 
         deleteButton = (Button) findViewById(R.id.DeleteButton);
         chartButton = (Button) findViewById(R.id.ChartButton);
-        connectButton = (Button) findViewById(R.id.ConnectButton);
         stepCountView = (TextView) findViewById(R.id.StepCountView);
-        disconnectButton = (Button) findViewById(R.id.DisconnectButton);
+        caloriesView = (TextView) findViewById(R.id.CaloriesView);
+        connectSwitch = (Switch)  findViewById(R.id.ConnectSwitch);
+        stepProgressBar = (ProgressBar) findViewById(R.id.StepProgressBar);
+        caloriesProgressbar = (ProgressBar) findViewById(R.id.CaloriesProgressBar);
+
+        setStepCount(0);
 
         NotificationListener.setBindListener(new NotificationBinder() {
             @Override
@@ -43,35 +50,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Incoming call from: " + phoneNumber);
                 senderClass.sendIncomingPhoneCallNotification(phoneNumber);
             }
-        });
 
-        connectButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View V){
-                Log.d(TAG, "Connecting.");
-                Toast.makeText(MainActivity.this, "Connecting...", Toast.LENGTH_SHORT).show();
-                new ConnectBT(senderClass, new ConnectBTAnswer() {
-                    @Override
-                    public void isFinished(Boolean connected) {
-                        Log.d(TAG, connected.toString());
-                        if (connected){
-                            Log.d(TAG, "Connected.");
-                            Toast.makeText(MainActivity.this, "Connected.", Toast.LENGTH_SHORT).show();
-                            btrThread = new BluetoothReceiverThread(senderClass.getBluetoothSocket(), handler);
-                            btrThread.start();
-                            senderClass.sendTime();
-                            try {
-                                TimeUnit.SECONDS.sleep(1);
-                            } catch (InterruptedException e) {
-                                Log.d(TAG, "Delay interrupted.");
-                            }
-                            senderClass.sendDate();
-                        }
-                        else{
-                            Log.d(TAG, "Connection failed.");
-                            Toast.makeText(MainActivity.this, "Connection failed.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }).execute();
+            @Override
+            public void endOfCall(){
+                Log.d(TAG, "Call ended.");
+                senderClass.sendEndOfNotification();
             }
         });
 
@@ -90,9 +73,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        disconnectButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View V){
-               disconnect();
+        connectSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    Log.d(TAG, "Connecting.");
+                    Toast.makeText(MainActivity.this, "Connecting...", Toast.LENGTH_SHORT).show();
+                    new ConnectBluetooth(senderClass, new ConnectBluetoothAnswer() {
+                        @Override
+                        public void isFinished(Boolean connected) {
+                            Log.d(TAG, connected.toString());
+                            if (connected){
+                                Log.d(TAG, "Connected.");
+                                Toast.makeText(MainActivity.this, "Connected.", Toast.LENGTH_SHORT).show();
+                                btrThread = new BluetoothReceiverThread(senderClass.getBluetoothSocket(), handler);
+                                btrThread.start();
+                            }
+                            else{
+                                Log.d(TAG, "Connection failed.");
+                                Toast.makeText(MainActivity.this, "Connection failed.", Toast.LENGTH_SHORT).show();
+                                connectSwitch.setChecked(false);
+                            }
+                        }
+                    }).execute();
+                }
+                else{
+                    disconnect();
+                }
             }
         });
 
@@ -108,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void callReceived(String phoneNumber){
-                if (phoneNumber.equals("end")){
-                    Log.d(TAG, "Call ended.");
-                    senderClass.sendEndOfNotification();
-                }
-                else{
                     Log.d(TAG, "Incoming call from: " + phoneNumber);
                     senderClass.sendIncomingPhoneCallNotification(phoneNumber);
-                }
+            }
+
+            @Override
+            public void endOfCall(){
+                Log.d(TAG, "Call ended.");
+                senderClass.sendEndOfNotification();
             }
         });
     }
@@ -140,13 +146,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void setStepCount(int stepCount) {
-        if (MainActivity.stepCount < stepCount){
+        Log.d(TAG, "Actual stepcount: " + MainActivity.stepCount);
+        Log.d(TAG, "Received stepcount: " + stepCount);
+        if (stepCount == 0){
+            Log.d(TAG, "Setting time.");
+            senderClass.sendTime();
+            senderClass.sendDate();
+        }
+        if (MainActivity.stepCount > stepCount){
             MainActivity.stepCount += stepCount;
             senderClass.sendStepCount(MainActivity.stepCount);
         }
         else{
             MainActivity.stepCount = stepCount;
         }
+        int calories = 6*MainActivity.stepCount/130;
         stepCountView.setText("Actual steps: " + MainActivity.stepCount);
+        caloriesView.setText("Calories: " + calories);
+        stepProgressBar.setProgress(MainActivity.stepCount);
+        caloriesProgressbar.setProgress(calories);
     }
+
 }

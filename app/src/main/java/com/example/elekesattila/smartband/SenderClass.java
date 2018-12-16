@@ -14,12 +14,16 @@ public class SenderClass {
     private BluetoothSocket bluetoothSocket = null;
 
     private void sendData(String messageString){
+        messageString += "\n";
         Log.d(TAG, "Message to send: " + messageString);
         if (bluetoothSocket != null){
             try{
                 OutputStream outputStream = bluetoothSocket.getOutputStream();
-                outputStream.write(messageString.getBytes());
-                Log.d (TAG, "Message sent.");
+                byte[] messageBytes = messageString.getBytes();
+                int messageLength = messageBytes.length;
+                outputStream.write(messageBytes, 0, messageLength);
+                outputStream.flush();
+                Log.d (TAG, "Message sent. Bytes: " + messageLength);
             }
             catch (IOException e){
                 Log.d(TAG, "Error sending message.");
@@ -50,10 +54,7 @@ public class SenderClass {
         Log.d(TAG, "Sending date.");
         DateFormat timeFormat = new SimpleDateFormat("MMdd");
         Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-        Log.d(TAG, "Day1: "+day);
-        day = day - 1;
-        Log.d(TAG, "Day2: "+day);
+        int day = calendar.get(Calendar.DAY_OF_WEEK) - 2;
         messageString = "d" + timeFormat.format(Calendar.getInstance().getTime()) + day;
         sendData(messageString);
     }

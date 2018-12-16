@@ -65,9 +65,6 @@ public class NotificationListener extends BroadcastReceiver {
     }
 
     public void onCallStateChanged (int state){
-        if(lastState == state){
-            return;
-        }
         switch (state) {
             case TelephonyManager.CALL_STATE_RINGING:
                 Log.d(TAG, "Incoming call, ringing: " + number);
@@ -80,9 +77,9 @@ public class NotificationListener extends BroadcastReceiver {
                 }
                 break;
             case TelephonyManager.CALL_STATE_IDLE:
-                Log.d(TAG, "Incoming call, end: " + number);
+                Log.d(TAG, "End of notifiation: " + number);
                 if (notificationBinder != null){
-                    notificationBinder.callReceived("end");
+                    notificationBinder.endOfCall();
                     notificationSent = false;
                 }
                 else{

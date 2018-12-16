@@ -9,17 +9,17 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-class ConnectBT extends AsyncTask<Void, Void, Void> {
+class ConnectBluetooth extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "SmartBandConnectBT";
     private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private boolean isConnected = false;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
-    private String address = "98:D3:51:FD:74:D1";
+    private String address = "98:D3:51:FD:74:D1"; //HC-05
     private SenderClass senderClass;
-    public ConnectBTAnswer delegate = null;
+    public ConnectBluetoothAnswer delegate = null;
 
-    public ConnectBT(SenderClass senderClass, ConnectBTAnswer answer){
+    public ConnectBluetooth(SenderClass senderClass, ConnectBluetoothAnswer answer){
         this.delegate = answer;
         this.senderClass = senderClass;
     }
@@ -55,5 +55,9 @@ class ConnectBT extends AsyncTask<Void, Void, Void> {
             Log.d(TAG, "Not connected.");
         }
         delegate.isFinished(isConnected);
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

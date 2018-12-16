@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.Viewport;
@@ -28,7 +29,7 @@ public class LineChartActivity extends AppCompatActivity{
         try{
             Log.d(TAG, "Trying to load chart data.");
             stepChartData.setChartData();
-            updateChartData(new SimpleDateFormat("MMmdd").toString(), MainActivity.getStepCount());
+            updateChartData(new SimpleDateFormat("MMMdd").format(Calendar.getInstance().getTime()), MainActivity.getStepCount());
             lineChartData = stepChartData.getLineChartData();
         }
         catch (IOException e){

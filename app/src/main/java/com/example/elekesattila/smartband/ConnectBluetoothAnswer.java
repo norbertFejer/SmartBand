@@ -1,5 +1,5 @@
 package com.example.elekesattila.smartband;
 
-public interface ConnectBTAnswer {
+public interface ConnectBluetoothAnswer {
     void isFinished(Boolean result);
 }

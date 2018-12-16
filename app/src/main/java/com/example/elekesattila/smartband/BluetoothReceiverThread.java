@@ -30,15 +30,18 @@ public class BluetoothReceiverThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[256];
+        byte[] buffer = new byte[8];
         int bytes;
 
         while (true) {
             try {
-                bytes = inputStream.read(buffer);
-                handler.obtainMessage(1, bytes, -1, buffer).sendToTarget();
-                handler.handleMessage(new Message());
-            } catch (IOException e) {
+                bytes = inputStream.read(buffer, 0, 8);
+                if (bytes == 1){
+                    bytes = inputStream.read(buffer, 0, 8);
+                    handler.obtainMessage(1, bytes, -1, buffer).sendToTarget();
+                    handler.handleMessage(new Message());
+                }
+            } catch (Exception e) {
                 break;
             }
         }
