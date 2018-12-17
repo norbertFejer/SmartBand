@@ -47,6 +47,9 @@ void DataProcessModule::processData(String data){
 		case 110: //n
 			n_case(data);
 			break;
+		case 99: //c
+			c_case(data);
+			break;
 	}
 
 }
@@ -74,7 +77,7 @@ void DataProcessModule::d_case(String data){
 }
 
 void DataProcessModule::m_case(String data){
-	String message = data.substring(1, data.length() - 1);
+	String message = data.substring(1, data.length());
 	mNotificationModule->setMessage("You have one new message from " + message + "!");
 	mBluetoothCommunicationModule->setShowNotification(true);
 	mDisplayModule->turnOnBacklight();
@@ -82,7 +85,7 @@ void DataProcessModule::m_case(String data){
 }
 
 void DataProcessModule::p_case(String data){
-	String message = data.substring(1, data.length() - 1);
+	String message = data.substring(1, data.length());
 	mNotificationModule->setMessage(message + " is calling you...");
 	mBluetoothCommunicationModule->setShowNotification(true);
 	mDisplayModule->turnOnBacklight();
@@ -100,6 +103,20 @@ void DataProcessModule::n_case(String data){
 		mBluetoothCommunicationModule->setShowNotification(false);
 		mDisplayModule->printConnectionState(mBluetoothCommunicationModule->getConnectionState());
 		mDisplayModule->turnOffBacklight();
+	}
+	Serial.println(message);
+}
+
+void DataProcessModule::sendStepCounterValueToClient(){
+	mStepCounterModule->sendStepCounterValue();
+}
+
+void DataProcessModule::c_case(String data){
+	String message = data.substring(1, data.length());
+	if(message == "achieved"){
+		mNotificationModule->setMessage("Daily achievement completed!");
+		mBluetoothCommunicationModule->setShowNotification(true);
+		mDisplayModule->turnOnBacklight();
 	}
 	Serial.println(message);
 }

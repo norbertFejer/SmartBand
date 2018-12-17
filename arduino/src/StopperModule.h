@@ -16,7 +16,8 @@ public:
 		mSecond(0),
 		mMinute(0),
 		mDisplayModule(displayModule),
-		mRunningState(false)
+		mRunningState(false),
+		mShowStopperValue(false)
 	{
 		
 	}
@@ -32,6 +33,8 @@ public:
 	int getMinute();
 	int getSecond();
 	int getMilliseconds();
+	bool isStopperValueShowable();
+	void setShowStopperValue(bool state);
 
 private:
 
@@ -40,6 +43,7 @@ private:
 	int mMinute;
 	bool mRunningState;
 	DisplayModule *mDisplayModule;
+	bool mShowStopperValue;
 
 };
 

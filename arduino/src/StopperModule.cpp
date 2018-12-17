@@ -17,7 +17,11 @@ void StopperModule::runStopper()
 	}
 
 	//Serial.println(String(mMinute) + ":" + mSecond + ":" + String(mMillisecond));
-	mDisplayModule->printStopper(mMinute, mSecond, mMillisecond);
+	if(isStopperValueShowable()){
+
+		mDisplayModule->printStopper(mMinute, mSecond, mMillisecond);
+
+	}
 	delay(10);
 }
 
@@ -45,4 +49,12 @@ int StopperModule::getSecond(){
 
 int StopperModule::getMilliseconds(){
 	return mMillisecond;
+}
+
+bool StopperModule::isStopperValueShowable(){
+	return mShowStopperValue;
+}
+
+void StopperModule::setShowStopperValue(bool state){
+	mShowStopperValue = state;
 }

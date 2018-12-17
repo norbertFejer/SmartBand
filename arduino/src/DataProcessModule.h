@@ -39,6 +39,8 @@ public:
 	void p_case(String message);
 	void i_case(String message);
 	void n_case(String message);
+	void c_case(String message);
+	void sendStepCounterValueToClient();
 
 private:
 

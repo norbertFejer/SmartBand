@@ -37,6 +37,7 @@ public:
 	void initSensor();
 	void updateSensor();
 	void setStepCounter(int stepCount);
+	void sendStepCounterValue();
 
 
 private:

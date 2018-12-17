@@ -13,7 +13,7 @@ void StepCounterModule::runStepCounter()
 			mFlag = 1;
 			mIntervalCount = 0;
 			mDispayModule->printStepCounterValue(mStepCount);
-			mBtcModule->sendData(String(mStepCount));
+			sendStepCounterValue();
 
 		}
 
@@ -27,7 +27,7 @@ void StepCounterModule::runStepCounter()
 			mFlag = -1;
 			mIntervalCount = 0;
 			mDispayModule->printStepCounterValue(mStepCount);
-			mBtcModule->sendData(String(mStepCount));
+			sendStepCounterValue();
 
 		}
 
@@ -67,4 +67,10 @@ void StepCounterModule::setStepCounter(int stepCount){
 		mDispayModule->printStepCounterValue(mStepCount);
 	}
 	
+}
+
+void StepCounterModule::sendStepCounterValue(){
+	if(mBtcModule->getConnectionState() == 1){
+		mBtcModule->sendData("s" + String(mStepCount) + "\n");
+	}
 }

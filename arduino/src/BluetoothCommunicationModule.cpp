@@ -9,6 +9,7 @@ void BluetoothCommunicationModule::runBluetoothCommunication()
 		String receivedStr = mSerialBtCommunication->readStringUntil('\n');
 		mDataProcessModule->processData(receivedStr);
 		Serial.println(receivedStr);
+		mSerialBtCommunication->flush();
 	}
 
 	if (Serial.available()){
@@ -31,6 +32,10 @@ void BluetoothCommunicationModule::checkConnectionState(){
 
 	    mConnState = digitalRead(mStatePin);
 	    mDataProcessModule->processData("i" + String(mConnState));
+
+	    if(mConnState == 1){
+	    	mDataProcessModule->sendStepCounterValueToClient();
+	    }
 	    
     }
 
@@ -43,6 +48,7 @@ void BluetoothCommunicationModule::sendData(String message){
 }
 
 void BluetoothCommunicationModule::setShowNotification(bool state){
+	delay(800);
 	showNotification = state;
 }
 	

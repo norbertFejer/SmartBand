@@ -163,7 +163,10 @@ void loop() {
     }
     else{
       confirmBtnState = 1;
-      isStopperRunnable = !isStopperRunnable;
+      if(pageNumber == 1){
+        isStopperRunnable = !isStopperRunnable;
+        confirmBtnState = 0;
+      }
       Serial.println("pressed");
     }
     confirmBtnPressed = false;
@@ -180,6 +183,7 @@ void loop() {
       displayModule.turnOffBacklight();
       confirmBtnState = 0;
     }
+    stopperModule.setShowStopperValue(false);
   }
   else{
     if(resetStopper){
@@ -188,8 +192,9 @@ void loop() {
      displayModule.printStopper(0,0,0);
      isStopperRunnable = false;
     }
-    if(isStopperRunnable){
-      stopperModule.runStopper();
-    }
+    stopperModule.setShowStopperValue(true);
+  }
+  if(isStopperRunnable){
+    stopperModule.runStopper();
   }
 }

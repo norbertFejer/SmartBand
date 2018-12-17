@@ -101,7 +101,7 @@ void DateTimeModule::setDate(String date)
 
 void DateTimeModule::setTime(String time)
 {
-	if(time.length() == 5){
+	if(time.length() == 4){
 		String hour = time.substring(0, 2);
 		if(hour.toInt() >= 0 && hour.toInt() < 23){
 			mHour = hour.toInt();
