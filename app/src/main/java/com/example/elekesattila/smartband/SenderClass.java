@@ -55,6 +55,9 @@ public class SenderClass {
         DateFormat timeFormat = new SimpleDateFormat("MMdd");
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+        if (day < 0){
+            day = 6;
+        }
         messageString = "d" + timeFormat.format(Calendar.getInstance().getTime()) + day;
         sendData(messageString);
     }
@@ -77,6 +80,13 @@ public class SenderClass {
         String messageString;
         Log.d(TAG, "Sending end of notification.");
         messageString = "nend";
+        sendData(messageString);
+    }
+
+    public void sendAchievementNotification(){
+        String messageString;
+        Log.d(TAG, "Sending achievement notification.");
+        messageString = "cachieved";
         sendData(messageString);
     }
 

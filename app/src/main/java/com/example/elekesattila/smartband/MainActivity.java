@@ -1,6 +1,7 @@
 package com.example.elekesattila.smartband;
 
-import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,15 +15,20 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import lecho.lib.hellocharts.view.LineChartView;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SmartBandMainActivity";
-    private static int stepCount;
+    private static int stepCount, maxStepCount;
+    private static Boolean goalAchieved;
     private Button deleteButton, chartButton;
     private Switch connectSwitch;
     private static TextView stepCountView, caloriesView;
     private static ProgressBar stepProgressBar, caloriesProgressbar;
+    private static LineChartView lineChartView;
     private static MessageHandler handler = new MessageHandler();
     private static SenderClass senderClass = new SenderClass();
+    private static LineChart lineChart;
     private BluetoothReceiverThread btrThread;
 
     protected void onCreate(Bundle savedInstanceState){
@@ -36,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
         connectSwitch = (Switch)  findViewById(R.id.ConnectSwitch);
         stepProgressBar = (ProgressBar) findViewById(R.id.StepProgressBar);
         caloriesProgressbar = (ProgressBar) findViewById(R.id.CaloriesProgressBar);
+        lineChartView = (LineChartView) findViewById(R.id.LineChartView);
 
-        setStepCount(0);
+        setStepCount(-1);
+        maxStepCount = stepProgressBar.getMax();
 
         NotificationListener.setBindListener(new NotificationBinder() {
             @Override
@@ -60,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         deleteButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View V){
+                lineChartView.setVisibility(View.INVISIBLE);
                 new StepChartData().deleteFile();
             }
         });
@@ -67,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
         chartButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View V){
                 Log.d (TAG, "ChartButton pressed.");
-                Intent intent = new Intent(MainActivity.this, LineChartActivity.class);
-                Log.d (TAG, "Starting LineChartActivity.");
-                startActivity(intent);
+                lineChart = new LineChart();
+                lineChart.setLineChart(lineChartView);
+                lineChartView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -148,10 +157,9 @@ public class MainActivity extends AppCompatActivity {
     public static void setStepCount(int stepCount) {
         Log.d(TAG, "Actual stepcount: " + MainActivity.stepCount);
         Log.d(TAG, "Received stepcount: " + stepCount);
-        if (stepCount == 0){
-            Log.d(TAG, "Setting time.");
-            senderClass.sendTime();
-            senderClass.sendDate();
+        if (stepCount == -1){
+            MainActivity.stepCount = stepCount;
+            return;
         }
         if (MainActivity.stepCount > stepCount){
             MainActivity.stepCount += stepCount;
@@ -160,11 +168,28 @@ public class MainActivity extends AppCompatActivity {
         else{
             MainActivity.stepCount = stepCount;
         }
-        int calories = 6*MainActivity.stepCount/130;
-        stepCountView.setText("Actual steps: " + MainActivity.stepCount);
-        caloriesView.setText("Calories: " + calories);
-        stepProgressBar.setProgress(MainActivity.stepCount);
-        caloriesProgressbar.setProgress(calories);
+        int calories = 60*MainActivity.stepCount/130;
+        if (MainActivity.stepCount >= MainActivity.maxStepCount){
+            stepCountView.setText("Actual steps: " + MainActivity.stepCount + "You achieved your daily goal!");
+            caloriesView.setText("Calories: " + calories);
+            stepProgressBar.setProgress(stepProgressBar.getMax());
+            caloriesProgressbar.setProgress(caloriesProgressbar.getMax());
+            if (!goalAchieved){
+                senderClass.sendAchievementNotification();
+                goalAchieved = true;
+            }
+        }
+        else {
+            stepCountView.setText("Actual steps: " + MainActivity.stepCount);
+            caloriesView.setText("Calories: " + calories);
+            stepProgressBar.setProgress(MainActivity.stepCount);
+            caloriesProgressbar.setProgress(calories);
+        }
     }
 
+    public static void setTime(){
+        Log.d(TAG, "Setting time.");
+        senderClass.sendTime();
+        senderClass.sendDate();
+    }
 }

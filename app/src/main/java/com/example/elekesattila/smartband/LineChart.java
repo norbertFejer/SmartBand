@@ -1,7 +1,5 @@
 package com.example.elekesattila.smartband;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 import java.io.IOException;
@@ -12,18 +10,15 @@ import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.LineChartView;
 
-public class LineChartActivity extends AppCompatActivity{
-    private static final String TAG = "SmartBandLineChartActiv";
+public class LineChart {
+    private static final String TAG = "SmartBandLineChart";
     private LineChartView lineChartView;
     private LineChartData lineChartData;
     private StepChartData stepChartData;
 
 
-    protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_line_chart);
-        Log.d (TAG, "LineChartActivity started.");
-        lineChartView = findViewById(R.id.LineChartView);
+    protected void setLineChart(LineChartView lineChartView){
+        this.lineChartView = lineChartView;
         stepChartData = new StepChartData();
 
         try{
@@ -51,7 +46,6 @@ public class LineChartActivity extends AppCompatActivity{
         }
         else{
             Log.d(TAG, "Null chart data or nothing to show.");
-            finish();
         }
     }
 
@@ -59,4 +53,3 @@ public class LineChartActivity extends AppCompatActivity{
         stepChartData.saveData(newXData, newYData);
     }
 }
-

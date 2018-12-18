@@ -50,14 +50,11 @@ class ConnectBluetooth extends AsyncTask<Void, Void, Void> {
         if (btSocket!=null){
             Log.d(TAG, "Connected.");
             senderClass.setBluetoothSocket(btSocket);
+            MainActivity.setTime();
         }
         else{
             Log.d(TAG, "Not connected.");
         }
         delegate.isFinished(isConnected);
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 }

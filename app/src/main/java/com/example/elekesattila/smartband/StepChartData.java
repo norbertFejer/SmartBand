@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import lecho.lib.hellocharts.model.Axis;
@@ -65,7 +66,7 @@ public class StepChartData {
 
                 xAxisData = xAxisLine.split(" ", -1);
                 yAxisData = yAxisLine.split(" ", -1);
-                //API problems
+                Log.d(TAG, "Reading data.");
 
                 for (int i = 0; i < xAxisData.length; ++i) {
                     xAxisValues.add(new AxisValue(i).setLabel(xAxisData[i]));
@@ -73,6 +74,8 @@ public class StepChartData {
                 for (int i = 0; i < yAxisData.length; ++i) {
                     yAxisValues.add(new PointValue(i, Integer.parseInt(yAxisData[i])));
                 }
+                //API problems
+                Log.d(TAG, "Processing data.");
 
                 Line line = new Line(yAxisValues).setColor(Color.parseColor("#094200"));
 
@@ -82,15 +85,16 @@ public class StepChartData {
 
                 Axis xAxis = new Axis();
                 xAxis.setValues(xAxisValues);
-                xAxis.setTextSize(16);
+                xAxis.setTextSize(12);
                 xAxis.setTextColor(Color.parseColor("#000000"));
                 data.setAxisXBottom(xAxis);
 
                 Axis yAxis = new Axis();
                 xAxis.setName("Footsteps per day");
-                yAxis.setTextSize(16);
+                yAxis.setTextSize(12);
                 xAxis.setTextColor(Color.parseColor("#000000"));
                 data.setAxisYLeft(yAxis);
+                Log.d(TAG, "Data ready.");
 
             } catch (IOException e) {
                 Log.d(TAG, "Cannot read data");
@@ -115,15 +119,27 @@ public class StepChartData {
             yAxisLine = newYData.toString();
         }
         else {
-            DateFormat todayDate = new SimpleDateFormat("MMmdd");
-            if (xAxisData[xAxisData.length-1].equals(todayDate.toString())){
+            if (xAxisData[xAxisData.length-1].equals(newXData)){
+                Log.d(TAG, "Updating chart data.");
                 if (newYData > Integer.parseInt(yAxisData[yAxisData.length-1])){
+                    Log.d(TAG, "Updating actual stepcount.");
                     yAxisData[yAxisData.length-1] = newYData.toString();
+                    StringBuilder builder = new StringBuilder();
+                    for(int i=0; i < yAxisData.length; ++i) {
+                        if (i == 0){
+                            builder.append(yAxisData[i]);
+                        }
+                        else{
+                            builder.append(" " + yAxisData[i]);
+                        }
+                    }
+                    yAxisLine = builder.toString();
                 }
             }
             else{
-                xAxisLine = xAxisLine + newXData;
-                yAxisLine = yAxisLine + newYData.toString();
+                Log.d(TAG, "Adding new chart data.");
+                xAxisLine = xAxisLine + " " + newXData;
+                yAxisLine = yAxisLine + " " + newYData.toString();
             }
         }
         PrintWriter writer = null;
